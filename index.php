@@ -6,44 +6,74 @@
    </head>
    <body>
         <?php
-            //starts a new tic tac toe game
-            new Game();
+            
+            //line 10 gets the input from url "xoxoxoxo" from url /?board=xoxoxo
+            $position = $_GET['board'];
+            //line 12 splits the string into it squares for the board
+            $squares = str_split($position);
+            //creates the new game
+            $game = new Game($squares);
+            //calling on the AI function 
+            $game->bot(); 
+            //calling on the display function to draw the board 
+            $game->display(); 
+            
+            if($game->winner('x')){
+                echo 'You Win!';
+            }
+            else if($game->winner('o')) {
+                echo 'I Win!';
+            }
+            else {
+                echo 'No Winner Yet!';
+            }
+            
         ?>
    </body>   
 </html>
 <?php 
     
     class Game{
+        
         var $position; 
+        var $board = '---------';
 
-        function __construct() {
-            $this->position = str_split($squares);
+        function __construct($squares) {
+            $this->position = $squares;
         }
-
+        
         //This function displays the basic tic tac toe table
         function display() {
             echo 'Welcome to Khang\'s Tic Tac Toe Game!';
-            echo '<table cols=”3” style=”font­size:large; font­weight:bold”>';
+            echo '<font size = "5">';
+            echo '<table cols=”3” border="1" style=”font­size:large; font­weight:bold”>';
             echo '<tr>'; // open the first row
             for ($pos=0; $pos<9;$pos++) {
-              echo '<td>'. $this->position[$pos] .'</td>';
+              echo $this->show_cell($pos);
               if ($pos %3 == 2){ 
                   echo '</tr><tr>'; // start a new row for the next square
               }
             } 
             echo '</tr>'; // close the last row
             echo '</table>';
+            //this form action is for starting a new game
+            echo '<form action>';
+            echo '<div>';
+                //this is a hidden input button that gets triggered when the 
+                //submit button is clicked
+                echo '<input type="hidden" name="board" value="---------"/>';
+		echo '<input type="submit" name="button" value="Start a New Game"/>';
+            echo '</div>';
+        echo '</form> </br>';
+        if($this->board == '---------'){
+                $this->display_message('new game'); 
+            } else{
+                echo ''; 
+            }
         }
 
-   
-        /*
-        if(winner('x',$squares)) echo 'You Win!';
-        else if(winner('o',$squares)) echo 'I Win!';
-        else echo 'No Winner Yet!'; 
-        echo 'Hi There!';*/
-
-
-        function winner ($token, $position){
+        
+        function winner ($token){
         $won = false; 
 
         //line 37 starts a loop to check for horizontal lines
@@ -51,7 +81,7 @@
         //$token represents 
         for($row=0; $row<3; $row++){
             for($col=0; $col<3; $col++){
-                if ($position[3*$row+$col] == $token){
+                if ($this->position[3*$row+$col] == $token){
                     $won=true;
                 }else{
                     $won = false; 
@@ -59,42 +89,80 @@
                 }
             }
             if($won == true){ 
-                break;
+                return true;
             }
         }
 
         //line 52 checks for verticals
         for($col=0; $col<3; $col++){
          for($row=0; $row<3; $row++){
-             if ($position[$col+3*$row] == $token){
+             if ($this->position[$col+3*$row] == $token){
                  $won=true;
              }else{
                  $won = false; 
                  break; 
              }
-         }
+        }
          if($won == true){ 
-             break;
-         }
+             return true;
+         } 
         }
 
-        //line68 checks for one diaganol win
+        //this condition checks for one diaganol win
         $row = 0; 
-        if (($position[$row] == $token) && ($position[$row + 4] == $token)
-             && ($position[$row + 8] == $token)){
+        if (($this->position[$row] == $token) && ($this->position[$row + 4] == $token)
+             && ($this->position[$row + 8] == $token)){
             $won = true; 
         } else{
             $won = false; 
         }
 
-        //line 76 checks for the other diagonal win 
-        if (($position[$row + 2] == $token) && ($position[$row + 4] == $token)
-             && ($position[$row + 6] == $token)){
+        //this condition checks for the other diagonal win 
+        if (($this->position[$row + 2] == $token) && ($this->position[$row + 4] == $token)
+             && ($this->position[$row + 6] == $token)){
             $won = true; 
         } else{
             $won = false; 
         }
+        return $won; 
        }
+       
+        function show_cell($which){
+           $token = $this->position[$which];
+           // deal with the easy case
+           if($token <> '-'){
+               return '<td>'.$token.'</td>'; 
+           }
+           //now the hard case
+           $this->newposition = $this->position; //copy the original     
+           $this->newposition[$which] = 'x'; //this would be their move
+           $move = implode($this->newposition); //make a string from the board array
+           $link = '?board='.$move; //this is what we want the link to be
+           //so return a cell containing an anchor and showing a hyphen 
+           return '<td><a href="'.$link.'">-</a></td>'; 
+        }
+        //This is a simple AI bot 
+        function bot(){
+            //this for loops iterates through the entire board and finds a - 
+            //and replaces it with a o 
+            for($i=0; $i<8; $i++){
+                if($this->position[$i] == '-'){
+                    $this->position[$i] = 'o'; 
+                    break; 
+                }
+            }
+        }
+        
+        //this function basically displays the message
+        function display_message($message){
+            
+            switch($message){
+                case 'new game':
+                    echo "Shall we begin! Click on a box to place your x";
+            }
+            
+        }
     }
+    
 ?>
 
