@@ -19,12 +19,15 @@
             $game->display(); 
             
             if($game->winner('x')){
+                //echo '<br/>';
                 echo 'You Win!';
             }
             else if($game->winner('o')) {
+                //echo '<br/>';
                 echo 'I Win!';
             }
             else {
+                //echo '<br/>';
                 echo 'No Winner Yet!';
             }
             
@@ -65,6 +68,7 @@
 		echo '<input type="submit" name="button" value="Start a New Game"/>';
             echo '</div>';
         echo '</form> </br>';
+        //this displays the new game message when the board is at a new game state
         if($this->board == '---------'){
                 $this->display_message('new game'); 
             } else{
@@ -108,22 +112,18 @@
          } 
         }
 
-        //this condition checks for one diaganol win
+        //this condition checks for the diagonal wins
         $row = 0; 
         if (($this->position[$row] == $token) && ($this->position[$row + 4] == $token)
              && ($this->position[$row + 8] == $token)){
             $won = true; 
-        } else{
-            $won = false; 
-        }
-
-        //this condition checks for the other diagonal win 
-        if (($this->position[$row + 2] == $token) && ($this->position[$row + 4] == $token)
+        } else  if (($this->position[$row + 2] == $token) && ($this->position[$row + 4] == $token)
              && ($this->position[$row + 6] == $token)){
             $won = true; 
         } else{
             $won = false; 
-        }
+        }  
+    
         return $won; 
        }
        
@@ -144,12 +144,17 @@
         //This is a simple AI bot 
         function bot(){
             //this for loops iterates through the entire board and finds a - 
-            //and replaces it with a o 
+            //and replaces it with a o
+            $this->board = implode($this->position); 
             for($i=0; $i<8; $i++){
-                if($this->position[$i] == '-'){
+                //this generates a random square and assigns it to var $i 
+                $i = rand(0, 8); 
+                //this condition checks to see if the square is - and that 
+                //the player x starts first
+                if($this->position[$i] == '-' && $this->board != '---------'){
                     $this->position[$i] = 'o'; 
                     break; 
-                }
+                } 
             }
         }
         
@@ -158,7 +163,7 @@
             
             switch($message){
                 case 'new game':
-                    echo "Shall we begin! Click on a box to place your x";
+                    echo "Shall we begin! To start, click on a box to place your x. ";
             }
             
         }
